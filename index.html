@@ -117,11 +117,12 @@
   .tag-row{display:flex; gap:.4rem; flex-wrap:wrap;}
   .tag{font-size:.72rem; color:var(--muted); background:var(--ink); border:1px solid var(--line); border-radius:5px; padding:.15rem .5rem;}
   .diff{font-family:'JetBrains Mono',monospace; font-size:.85rem; white-space:nowrap; margin-left:1rem;}
-  .diff-easy{color:var(--signal2);}
-  .diff-medium, .diff-hard{color:var(--warn);}
+  .diff-easy{color:var(--lc-easy, var(--signal2));}
+  .diff-medium{color:var(--lc-medium, var(--warn));}
+  .diff-hard{color:var(--lc-hard, var(--warn));}
   .solved-badge{font-size:.72rem; color:var(--signal2); border:1px solid rgba(55,226,196,.4); border-radius:5px; padding:.15rem .5rem; margin-left:.5rem;}
 
-  /* Editor */
+  /* Editor (scratchpad) */
   .editor-grid{display:grid; grid-template-columns:1fr; gap:1.2rem;}
   @media (min-width:980px){ .editor-grid{grid-template-columns:1fr 1fr;} }
   .editor-wrap{position:relative; overflow:hidden;}
@@ -144,14 +145,6 @@
   @keyframes spin{to{transform:rotate(360deg);}}
   .run-output{background:var(--ink); border:1px solid var(--line); border-radius:8px; padding:.7rem; margin-top:.8rem; font-size:.78rem; max-height:150px; overflow:auto; white-space:pre-wrap;}
 
-  /* Problem detail */
-  .prob-desc{padding:1.4rem; margin-bottom:1.2rem;}
-  .prob-desc h2{font-family:'JetBrains Mono',monospace; font-size:1.25rem; margin:0 0 .6rem;}
-  .prob-desc p{color:var(--muted); line-height:1.65; font-size:.92rem;}
-  .test-result{padding:.6rem .8rem; border-radius:6px; margin-bottom:.5rem; font-size:.8rem; font-family:'JetBrains Mono',monospace;}
-  .test-pass{background:rgba(55,226,196,.08); border:1px solid rgba(55,226,196,.3); color:var(--signal2);}
-  .test-fail{background:rgba(255,138,92,.08); border:1px solid rgba(255,138,92,.3); color:var(--warn);}
-
   /* Profile */
   .kv{margin-bottom:1rem;}
   .kv .k{color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; margin-bottom:.2rem;}
@@ -160,6 +153,88 @@
   footer.site{border-top:1px solid var(--line); padding:2rem 0; text-align:center; color:var(--muted); font-size:.8rem;}
   .toast{position:fixed; bottom:1.2rem; right:1.2rem; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--signal2); border-radius:8px; padding:.8rem 1.1rem; font-size:.85rem; box-shadow:0 8px 30px rgba(0,0,0,.4); z-index:200; max-width:320px;}
   .toast.err{border-left-color:var(--warn);}
+
+  /* ================= LeetCode-style problem workspace ================= */
+  :root{
+    --lc-orange:#ffa116; --lc-easy:#00af9b; --lc-medium:#ffc01e; --lc-hard:#ff375f;
+    --lc-bg:#0e1116; --lc-panel2:#1d222b; --lc-line2:#2a3140;
+  }
+  .lc-shell{ display:flex; flex-direction:column; height:calc(100vh - 65px); background:var(--lc-bg); }
+  .lc-topbar{ display:flex; align-items:center; justify-content:space-between; padding:.7rem 1.2rem; border-bottom:1px solid var(--lc-line2); flex-wrap:wrap; gap:.7rem; background:var(--panel); }
+  .lc-title{ font-family:'JetBrains Mono',monospace; font-size:.92rem; display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; }
+  .lc-back{ font-size:.8rem; color:var(--muted); cursor:pointer; }
+  .lc-back:hover{ color:var(--paper); }
+  .lc-pill{ font-size:.7rem; padding:.2rem .6rem; border-radius:999px; font-family:'JetBrains Mono',monospace; text-transform:capitalize; }
+  .lc-pill.easy{ color:var(--lc-easy); background:rgba(0,175,155,.12); }
+  .lc-pill.medium{ color:var(--lc-medium); background:rgba(255,192,30,.12); }
+  .lc-pill.hard{ color:var(--lc-hard); background:rgba(255,55,95,.12); }
+  .lc-run-row{ display:flex; gap:.55rem; align-items:center; flex-wrap:wrap; }
+  .lc-btn{ font-family:'JetBrains Mono',monospace; font-size:.78rem; padding:.5rem 1rem; border-radius:6px; border:1px solid var(--lc-line2); background:var(--lc-panel2); color:var(--paper); cursor:pointer; display:inline-flex; align-items:center; gap:.4rem; transition:border-color .15s,color .15s,opacity .15s; }
+  .lc-btn:hover:not(:disabled){ border-color:var(--lc-orange); color:var(--lc-orange); }
+  .lc-btn.submit{ background:var(--lc-orange); color:#14110a; border-color:var(--lc-orange); font-weight:700; }
+  .lc-btn.submit:hover:not(:disabled){ opacity:.88; color:#14110a; }
+  .lc-btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .lc-body{ flex:1; display:flex; min-height:0; padding:.6rem; gap:0; }
+  .lc-pane{ display:flex; flex-direction:column; min-width:0; min-height:0; background:var(--panel); overflow:hidden; }
+  .lc-right{ flex-direction:column; }
+  .lc-splitter-v{ width:10px; cursor:col-resize; background:transparent; flex-shrink:0; position:relative; }
+  .lc-splitter-v::after{ content:""; position:absolute; left:50%; top:0; bottom:0; width:2px; background:var(--lc-line2); transform:translateX(-50%); }
+  .lc-splitter-v:hover::after, .lc-splitter-v.dragging::after{ background:var(--lc-orange); }
+  .lc-splitter-h{ height:10px; cursor:row-resize; background:transparent; flex-shrink:0; position:relative; }
+  .lc-splitter-h::after{ content:""; position:absolute; top:50%; left:0; right:0; height:2px; background:var(--lc-line2); transform:translateY(-50%); }
+  .lc-splitter-h:hover::after, .lc-splitter-h.dragging::after{ background:var(--lc-orange); }
+  .lc-tabbar{ display:flex; gap:.2rem; padding:.5rem .6rem; border-bottom:1px solid var(--lc-line2); flex-shrink:0; }
+  .lc-tab{ font-family:'JetBrains Mono',monospace; font-size:.76rem; padding:.4rem .8rem; border-radius:6px; color:var(--muted); cursor:pointer; border:none; background:none; }
+  .lc-tab.active{ background:var(--lc-panel2); color:var(--paper); }
+  .lc-tab:hover:not(.active){ color:var(--paper); }
+  .lc-tab.warn{ color:var(--warn); }
+  .lc-scroll{ flex:1; overflow-y:auto; padding:1.3rem 1.4rem; font-size:.9rem; line-height:1.65; }
+  .lc-scroll h2{ font-family:'JetBrains Mono',monospace; font-size:1.15rem; margin:.2rem 0 .9rem; }
+  .lc-scroll p{ color:var(--muted); margin:0 0 1rem; }
+  .lc-tag-row{ display:flex; gap:.4rem; flex-wrap:wrap; margin-top:1rem; }
+  .lc-editor-header{ display:flex; align-items:center; justify-content:space-between; padding:.55rem .9rem; border-bottom:1px solid var(--lc-line2); flex-shrink:0; }
+  .lc-console-tabs{ display:flex; gap:.3rem; padding:.5rem .6rem; border-bottom:1px solid var(--lc-line2); flex-shrink:0; }
+  .lc-case-row{ display:flex; gap:.4rem; padding:.7rem .8rem 0; flex-wrap:wrap; }
+  .lc-case-btn{ font-family:'JetBrains Mono',monospace; font-size:.73rem; padding:.35rem .8rem; border-radius:6px; border:1px solid var(--lc-line2); background:var(--lc-panel2); color:var(--muted); cursor:pointer; }
+  .lc-case-btn.active{ color:var(--paper); border-color:var(--lc-orange); }
+  .lc-case-btn.warn{ color:var(--warn); border-color:rgba(255,138,92,.4); }
+  .lc-case-body{ padding:.6rem .8rem 1rem; overflow-y:auto; flex:1; }
+  .lc-case-label{ font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin:.7rem 0 .35rem; }
+  .lc-case-value{ font-family:'JetBrains Mono',monospace; font-size:.82rem; background:var(--lc-panel2); border:1px solid var(--lc-line2); border-radius:6px; padding:.6rem .75rem; white-space:pre-wrap; word-break:break-word; }
+  .lc-result-summary{ font-family:'JetBrains Mono',monospace; font-size:.95rem; font-weight:700; padding:.9rem .9rem 0; }
+  textarea.lc-code-input{ flex:1; width:100%; resize:none; border:none; border-radius:0; font-family:'JetBrains Mono',monospace; font-size:.85rem; line-height:1.55; padding:1rem; background:var(--panel); tab-size:4; }
+  @media (max-width:860px){
+    .lc-body{ flex-direction:column; }
+    .lc-splitter-v{ display:none; }
+    .lc-left{ flex-basis:auto !important; max-height:42vh; }
+    .lc-right{ flex:1; }
+  }
+
+  /* ---- LeetCode-style practice list ---- */
+  .lc-list-wrap{ max-width:900px; margin:0 auto; }
+  .lc-progress-row{ display:flex; align-items:center; gap:.9rem; margin-bottom:1.5rem; }
+  .lc-progress-bar{ flex:1; height:6px; border-radius:999px; background:var(--lc-panel2); overflow:hidden; }
+  .lc-progress-fill{ height:100%; background:var(--lc-orange); border-radius:999px; transition:width .25s; }
+  .lc-list-toolbar{ display:flex; gap:.55rem; margin-bottom:1.2rem; flex-wrap:wrap; align-items:center; }
+  .lc-search{ flex:1; min-width:200px; }
+  .lc-filter-chip{ font-family:'JetBrains Mono',monospace; font-size:.76rem; padding:.42rem .9rem; border-radius:999px; border:1px solid var(--lc-line2); background:var(--lc-panel2); color:var(--muted); cursor:pointer; white-space:nowrap; transition:border-color .15s,color .15s; }
+  .lc-filter-chip:hover{ color:var(--paper); }
+  .lc-filter-chip.active{ border-color:var(--lc-orange); color:var(--lc-orange); }
+  .lc-table{ width:100%; border-collapse:collapse; }
+  .lc-table thead th{ text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); padding:.7rem .9rem; border-bottom:1px solid var(--lc-line2); }
+  .lc-table tbody tr{ cursor:pointer; transition:background .12s; }
+  .lc-table tbody tr:hover{ background:var(--lc-panel2); }
+  .lc-table tbody tr:not(:last-child) td{ border-bottom:1px solid var(--lc-line2); }
+  .lc-table tbody td{ padding:.8rem .9rem; font-size:.88rem; vertical-align:middle; }
+  .lc-status-dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .lc-status-dot.solved{ background:var(--lc-easy); box-shadow:0 0 0 3px rgba(0,175,155,.15); }
+  .lc-status-dot.unsolved{ background:var(--lc-line2); }
+  .lc-title-cell{ display:flex; align-items:center; gap:.6rem; font-weight:500; }
+  .lc-tag-inline{ font-size:.68rem; color:var(--muted); background:var(--lc-panel2); border:1px solid var(--lc-line2); border-radius:5px; padding:.1rem .45rem; margin-right:.3rem; display:inline-block; margin-top:.35rem; }
+  @media (max-width:640px){
+    .lc-table thead{ display:none; }
+    .lc-table td:first-child{ display:none; }
+  }
 </style>
 </head>
 <body>
@@ -3766,63 +3841,6 @@ function toast(msg, isErr){
   root.appendChild(el);
   setTimeout(() => el.remove(), 3200);
 }
-// builds the python snippet appended after user code to call their
-// function with parsed test-case args and print a comparable value
-function buildHarness(problem, test){
-  const lines = test.input.split("\n");
-  switch(problem.id){
-    case "two-sum": {
-      const nums = "[" + lines[0].trim().split(/\s+/).join(", ") + "]";
-      const target = lines[1].trim();
-      return `\n__r = ${problem.fnName}(${nums}, ${target})\nprint(' '.join(str(x) for x in __r))\n`;
-    }
-    case "reverse-string": {
-      const s = JSON.stringify(lines[0]);
-      return `\nprint(${problem.fnName}(${s}))\n`;
-    }
-    case "valid-parentheses": {
-      const s = JSON.stringify(lines[0]);
-      return `\nprint(${problem.fnName}(${s}))\n`;
-    }
-    case "binary-search": {
-      const nums = "[" + lines[0].trim().split(/\s+/).join(", ") + "]";
-      const target = lines[1].trim();
-      return `\nprint(${problem.fnName}(${nums}, ${target}))\n`;
-    }
-    default:
-      return "";
-  }
-}
-
-// ---------- persistence layer ----------
-async function getProblems(){
-  let p = await storeGet("cm:problems");
-  if(!p){ p = SEED_PROBLEMS; await storeSet("cm:problems", p); }
-  return p;
-}
-async function getUsers(){ return (await storeGet("cm:users")) || []; }
-async function saveUsers(users){ await storeSet("cm:users", users); }
-async function getSession(){ return await storeGet("cm:session"); }
-async function setSession(s){ await storeSet("cm:session", s); }
-async function getProgress(userId){ return (await storeGet("cm:progress:" + userId)) || {}; }
-async function saveProgress(userId, progress){ await storeSet("cm:progress:" + userId, progress); }
-
-async function hashPassword(pw){
-  const enc = new TextEncoder().encode(pw);
-  const buf = await crypto.subtle.digest("SHA-256", enc);
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
-}
-function uid(){ return Math.random().toString(36).slice(2) + Date.now().toString(36); }
-
-// ---------- toast ----------
-function toast(msg, isErr){
-  const root = document.getElementById("toast-root");
-  const el = document.createElement("div");
-  el.className = "toast" + (isErr ? " err" : "");
-  el.textContent = msg;
-  root.appendChild(el);
-  setTimeout(() => el.remove(), 3200);
-}
 
 // ---------- Claude API mentor calls ----------
 async function callClaude(system, userPrompt){
@@ -4186,7 +4204,7 @@ async function renderDashboard(app){
   </div>`;
 }
 
-// ---------- Editor ----------
+// ---------- Editor (scratchpad) ----------
 const EDITOR_DEFAULT = `def two_sum(nums, target):
     seen = {}
     for i, n in enumerate(nums):
@@ -4291,93 +4309,254 @@ async function runEditorAction(app){
   }
 }
 
-// ---------- Practice list ----------
+// ---------- Practice list (LeetCode-style problem table) ----------
+let practiceState = { search: "", difficulty: "all", status: "all" };
+
 async function renderPractice(app){
   const problems = await getProblems();
   const progress = await getProgress(CURRENT_USER.id);
-  app.innerHTML = `
-  <div class="page container-md">
-    <h1>Practice</h1>
-    <p class="sub">Pick a problem. Run it, get stuck, ask for a hint — that's the loop.</p>
-    <div>
-      ${problems.map(p => {
-        const solved = progress[p.id] && progress[p.id].solved;
-        return `
-        <div class="card problem-row" onclick="go('practice/${p.id}')">
-          <div>
-            <h3>${escapeHtml(p.title)} ${solved ? `<span class="solved-badge">✓ solved</span>` : ""}</h3>
-            <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
-          </div>
-          <span class="diff mono diff-${p.difficulty}">${p.difficulty}</span>
-        </div>`;
-      }).join("")}
-    </div>
-  </div>`;
+  renderPracticeList(app, problems, progress);
 }
 
-// ---------- Problem detail ----------
+function renderPracticeList(app, problems, progress){
+  const s = practiceState;
+  const solvedCount = problems.filter(p => progress[p.id] && progress[p.id].solved).length;
+
+  const filtered = problems.filter(p => {
+    if(s.difficulty !== "all" && p.difficulty !== s.difficulty) return false;
+    const solved = !!(progress[p.id] && progress[p.id].solved);
+    if(s.status === "solved" && !solved) return false;
+    if(s.status === "unsolved" && solved) return false;
+    if(s.search){
+      const q = s.search.toLowerCase();
+      const hay = (p.title + " " + p.tags.join(" ")).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const statusFilters = [["all","All"],["solved","Solved"],["unsolved","Unsolved"]];
+  const diffFilters = [["all","All levels"],["easy","Easy"],["medium","Medium"],["hard","Hard"]];
+
+  app.innerHTML = `
+  <div class="page">
+    <div class="lc-list-wrap">
+      <h1>Practice</h1>
+      <p class="sub">Pick a problem. Run it, get stuck, ask for a hint — that's the loop.</p>
+
+      <div class="lc-progress-row">
+        <span class="mono muted" style="font-size:.8rem; white-space:nowrap;">${solvedCount} / ${problems.length} solved</span>
+        <div class="lc-progress-bar"><div class="lc-progress-fill" style="width:${problems.length ? (solvedCount/problems.length*100) : 0}%;"></div></div>
+      </div>
+
+      <div class="lc-list-toolbar">
+        <input class="lc-search" id="lc-search" placeholder="Search by title or tag…" value="${escapeHtml(s.search)}" />
+        ${statusFilters.map(([v,l]) => `<button class="lc-filter-chip ${s.status===v?'active':''}" data-status="${v}">${l}</button>`).join("")}
+        ${diffFilters.map(([v,l]) => `<button class="lc-filter-chip ${s.difficulty===v?'active':''}" data-diff="${v}">${l}</button>`).join("")}
+      </div>
+
+      <div class="card" style="overflow:hidden;">
+        <table class="lc-table">
+          <thead><tr><th style="width:40px;"></th><th>Title</th><th style="width:110px;">Difficulty</th></tr></thead>
+          <tbody>
+            ${filtered.length ? filtered.map(p => {
+              const idx = problems.indexOf(p);
+              const solved = !!(progress[p.id] && progress[p.id].solved);
+              return `
+              <tr onclick="go('practice/${p.id}')">
+                <td><span class="lc-status-dot ${solved?'solved':'unsolved'}" title="${solved?'Solved':'Not solved'}"></span></td>
+                <td>
+                  <div class="lc-title-cell">
+                    <span class="mono muted" style="font-size:.78rem;">${idx+1}.</span>
+                    <span>${escapeHtml(p.title)}</span>
+                  </div>
+                  <div>${p.tags.map(t => `<span class="lc-tag-inline">${escapeHtml(t)}</span>`).join("")}</div>
+                </td>
+                <td><span class="lc-pill ${p.difficulty}">${p.difficulty}</span></td>
+              </tr>`;
+            }).join("") : `<tr><td colspan="3" class="muted" style="padding:2rem; text-align:center;">No problems match your filters.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+
+  const searchEl = document.getElementById("lc-search");
+  searchEl.addEventListener("input", (e) => {
+    practiceState.search = e.target.value;
+    renderPracticeList(app, problems, progress);
+    const el = document.getElementById("lc-search");
+    el.focus();
+    el.selectionStart = el.selectionEnd = el.value.length;
+  });
+  document.querySelectorAll("[data-status]").forEach(b => b.addEventListener("click", () => {
+    practiceState.status = b.dataset.status; renderPracticeList(app, problems, progress);
+  }));
+  document.querySelectorAll("[data-diff]").forEach(b => b.addEventListener("click", () => {
+    practiceState.difficulty = b.dataset.diff; renderPracticeList(app, problems, progress);
+  }));
+}
+
+// ============================================================
+// Problem workspace — LeetCode-style split view:
+// left = description / mentor hint, right = code editor (top)
+// + testcase / result console (bottom), with draggable splitters.
+// ============================================================
 let problemState = {};
+
+function ensureProblemState(problem){
+  if(!problemState[problem.id]){
+    problemState[problem.id] = {
+      code: problem.starter,
+      running: false,
+      results: null,
+      hint: "",
+      hintLoading: false,
+      hintLevel: 1,
+      leftTab: "description",
+      consoleTab: "testcase",
+      activeCase: 0,
+      leftWidth: 42,     // % of lc-body width
+      editorHeight: 60,  // % of lc-right height
+    };
+  }
+  return problemState[problem.id];
+}
+
 async function renderProblemDetail(app, id){
   const problems = await getProblems();
   const problem = problems.find(p => p.id === id);
   if(!problem){ app.innerHTML = `<div class="page container"><p>Problem not found. <a class="signal" onclick="go('practice')">Back to practice</a></p></div>`; return; }
-  if(!problemState[id]) problemState[id] = { code: problem.starter, results: null, running: false, hint: "", hintLoading: false, hintLevel: 1 };
-  const s = problemState[id];
+  const idx = problems.findIndex(p => p.id === id);
+  const s = ensureProblemState(problem);
 
   app.innerHTML = `
-  <div class="page container-md">
-    <a class="muted" style="font-size:.85rem;" onclick="go('practice')">← Back to practice</a>
-    <div class="card prob-desc" style="margin-top:1rem;">
-      <span class="diff mono diff-${problem.difficulty}">${problem.difficulty}</span>
-      <h2>${escapeHtml(problem.title)}</h2>
-      <p>${escapeHtml(problem.description)}</p>
-      <div class="tag-row">${problem.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+  <div class="lc-shell">
+    <div class="lc-topbar">
+      <div class="lc-title">
+        <span class="lc-back" onclick="go('practice')">&larr; Practice</span>
+        <span>${idx+1}. ${escapeHtml(problem.title)}</span>
+        <span class="lc-pill ${problem.difficulty}">${problem.difficulty}</span>
+      </div>
+      <div class="lc-run-row">
+        <select id="pd-hint-level" class="lc-btn" style="cursor:pointer;">
+          <option value="1" ${s.hintLevel===1?"selected":""}>Hint · nudge</option>
+          <option value="2" ${s.hintLevel===2?"selected":""}>Hint · strategy</option>
+          <option value="3" ${s.hintLevel===3?"selected":""}>Hint · near-solution</option>
+        </select>
+        <button class="lc-btn" id="pd-hint" ${s.hintLoading?"disabled":""}>${s.hintLoading ? "Thinking…" : "💡 Hint"}</button>
+        <button class="lc-btn" id="pd-run" ${s.running?"disabled":""}>${s.running ? `<span class="spinner"></span>` : "▶"} Run</button>
+        <button class="lc-btn submit" id="pd-submit" ${s.running?"disabled":""}>Submit</button>
+      </div>
     </div>
-
-    <div class="card editor-wrap" style="margin-bottom:1.2rem;">
-      <div class="editor-toolbar"><span class="muted mono" style="font-size:.75rem;">${problem.fnName}.py</span></div>
-      <textarea class="code-input" id="pd-code" style="height:260px;" spellcheck="false">${escapeHtml(s.code)}</textarea>
+    <div class="lc-body" id="lc-body">
+      <div class="card lc-pane lc-left" id="lc-left" style="flex:0 0 ${s.leftWidth}%;">
+        <div class="lc-tabbar">
+          <button class="lc-tab ${s.leftTab==='description'?'active':''}" data-lefttab="description">Description</button>
+          <button class="lc-tab ${s.leftTab==='hint'?'active':''}" data-lefttab="hint">Mentor Hint</button>
+        </div>
+        <div class="lc-scroll">${s.leftTab === 'description' ? renderProblemDescription(problem) : renderHintPanel(s)}</div>
+      </div>
+      <div class="lc-splitter-v" id="lc-splitter-v"></div>
+      <div class="lc-pane lc-right" id="lc-right" style="flex:1;">
+        <div class="card lc-pane" id="lc-editor-pane" style="flex:0 0 ${s.editorHeight}%;">
+          <div class="lc-editor-header">
+            <span class="muted mono" style="font-size:.75rem;">${problem.fnName}.py</span>
+            <span class="muted mono" style="font-size:.72rem;">Python3</span>
+          </div>
+          <textarea class="lc-code-input" id="pd-code" spellcheck="false">${escapeHtml(s.code)}</textarea>
+        </div>
+        <div class="lc-splitter-h" id="lc-splitter-h"></div>
+        <div class="card lc-pane" id="lc-console-pane" style="flex:1;">
+          <div class="lc-console-tabs">
+            <button class="lc-tab ${s.consoleTab==='testcase'?'active':''}" data-consoletab="testcase">Testcase</button>
+            <button class="lc-tab ${s.consoleTab==='result'?'active':''} ${s.results && !s.results.every(r=>r.pass) ? 'warn':''}" data-consoletab="result">Result</button>
+          </div>
+          <div style="flex:1; overflow-y:auto;" id="lc-console-body">${renderConsoleBody(problem, s)}</div>
+        </div>
+      </div>
     </div>
-
-    <div style="display:flex; gap:1rem; margin-bottom:1.2rem; flex-wrap:wrap;">
-      <button class="btn btn-primary" id="pd-run" ${s.running?"disabled":""}>${s.running ? `<span class="spinner"></span>Running…` : "Run tests"}</button>
-      <select id="pd-hint-level">
-        <option value="1" ${s.hintLevel===1?"selected":""}>Hint level 1 — nudge</option>
-        <option value="2" ${s.hintLevel===2?"selected":""}>Hint level 2 — strategy</option>
-        <option value="3" ${s.hintLevel===3?"selected":""}>Hint level 3 — near-solution</option>
-      </select>
-      <button class="btn btn-ghost" id="pd-hint" ${s.hintLoading?"disabled":""}>${s.hintLoading ? "Thinking…" : "Get a hint"}</button>
-    </div>
-
-    <div id="pd-results">${renderProblemResults(problem, s)}</div>
-    ${s.hint ? `<div class="card" style="padding:1.1rem; margin-top:1rem;"><p class="muted" style="font-size:.72rem; text-transform:uppercase; margin:0 0 .5rem;">Mentor hint</p><p style="margin:0; line-height:1.6;">${escapeHtml(s.hint)}</p></div>` : ""}
   </div>`;
 
   document.getElementById("pd-code").addEventListener("input", e => { s.code = e.target.value; });
   document.getElementById("pd-hint-level").addEventListener("change", e => { s.hintLevel = parseInt(e.target.value,10); });
-  document.getElementById("pd-run").addEventListener("click", () => runProblemTests(app, problem, s));
+  document.getElementById("pd-run").addEventListener("click", () => runProblemCode(app, problem, s, false));
+  document.getElementById("pd-submit").addEventListener("click", () => runProblemCode(app, problem, s, true));
   document.getElementById("pd-hint").addEventListener("click", () => getProblemHint(app, problem, s));
+  document.querySelectorAll("[data-lefttab]").forEach(b => b.addEventListener("click", () => { s.leftTab = b.dataset.lefttab; renderProblemDetail(app, id); }));
+  document.querySelectorAll("[data-consoletab]").forEach(b => b.addEventListener("click", () => { s.consoleTab = b.dataset.consoletab; renderProblemDetail(app, id); }));
+  document.querySelectorAll("[data-case]").forEach(b => b.addEventListener("click", () => { s.activeCase = parseInt(b.dataset.case,10); renderProblemDetail(app, id); }));
+
+  attachSplitterDrag(document.getElementById("lc-splitter-v"), document.getElementById("lc-body"), "horizontal", (pct) => {
+    s.leftWidth = pct;
+    document.getElementById("lc-left").style.flexBasis = pct + "%";
+  });
+  attachSplitterDrag(document.getElementById("lc-splitter-h"), document.getElementById("lc-right"), "vertical", (pct) => {
+    s.editorHeight = pct;
+    document.getElementById("lc-editor-pane").style.flexBasis = pct + "%";
+  });
 }
 
-function renderProblemResults(problem, s){
-  if(s.running) return `<p class="muted"><span class="spinner"></span>Running your code against ${problem.tests.length} test case(s)…</p>`;
-  if(!s.results) return "";
-  const allPass = s.results.every(r => r.pass);
+function renderProblemDescription(problem){
   return `
-    <p class="mono ${allPass ? 'signal2' : 'warn'}" style="margin-bottom:.6rem;">${allPass ? "✓ All tests passed" : "✗ Some tests failed"}</p>
-    ${s.results.map((r,i) => `
-      <div class="test-result ${r.pass ? 'test-pass' : 'test-fail'}">
-        Test ${i+1}: ${r.pass ? "passed" : "failed"} — expected <b>${escapeHtml(r.expected)}</b>, got <b>${escapeHtml(r.actual)}</b>
-        ${r.error ? `<div style="margin-top:.3rem;">${escapeHtml(r.error)}</div>` : ""}
-      </div>`).join("")}
+    <h2>${escapeHtml(problem.title)}</h2>
+    <p>${escapeHtml(problem.description)}</p>
+    <div class="lc-tag-row">${problem.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
   `;
 }
 
-async function runProblemTests(app, problem, s){
-  s.running = true; s.results = null;
-  document.getElementById("pd-results").innerHTML = renderProblemResults(problem, s);
-  document.getElementById("pd-run").disabled = true;
-  document.getElementById("pd-run").innerHTML = `<span class="spinner"></span>Running…`;
+function renderHintPanel(s){
+  if(s.hintLoading) return `<p class="muted"><span class="spinner"></span>Consulting the mentor…</p>`;
+  if(!s.hint) return `<p class="muted">Stuck? Pick a hint level up top and ask the mentor for a nudge — it's built to guide you, not just hand you the answer.</p>`;
+  return `<p style="white-space:pre-wrap;">${escapeHtml(s.hint)}</p>`;
+}
+
+function renderConsoleBody(problem, s){
+  if(s.consoleTab === "testcase"){
+    const t = problem.tests[s.activeCase] || problem.tests[0];
+    return `
+      <div class="lc-case-row">
+        ${problem.tests.map((_,i) => `<button class="lc-case-btn ${s.activeCase===i?'active':''}" data-case="${i}">Case ${i+1}</button>`).join("")}
+      </div>
+      <div class="lc-case-body">
+        <div class="lc-case-label">Input</div>
+        <div class="lc-case-value">${escapeHtml(t.input)}</div>
+      </div>
+    `;
+  }
+  // result tab
+  if(s.running) return `<p class="muted" style="padding:1rem;"><span class="spinner"></span>Running against ${problem.tests.length} test case(s)…</p>`;
+  if(!s.results) return `<p class="muted" style="padding:1rem;">Run or Submit to see results here.</p>`;
+  const allPass = s.results.every(r => r.pass);
+  return `
+    <p class="lc-result-summary ${allPass ? 'signal2' : 'warn'}">${allPass ? "✓ Accepted" : "✗ Wrong Answer"}</p>
+    <div class="lc-case-row">
+      ${s.results.map((r,i) => `<button class="lc-case-btn ${s.activeCase===i?'active':''} ${r.pass?'':'warn'}" data-case="${i}">Case ${i+1} ${r.pass?'✓':'✗'}</button>`).join("")}
+    </div>
+    <div class="lc-case-body">
+      ${renderCaseResult(problem, s)}
+    </div>
+  `;
+}
+
+function renderCaseResult(problem, s){
+  const i = s.activeCase < s.results.length ? s.activeCase : 0;
+  const r = s.results[i];
+  const t = problem.tests[i];
+  return `
+    <div class="lc-case-label">Input</div>
+    <div class="lc-case-value">${escapeHtml(t.input)}</div>
+    <div class="lc-case-label">Output</div>
+    <div class="lc-case-value">${escapeHtml(r.actual)}</div>
+    <div class="lc-case-label">Expected</div>
+    <div class="lc-case-value">${escapeHtml(r.expected)}</div>
+    ${r.error ? `<div class="lc-case-label warn">Error</div><div class="lc-case-value">${escapeHtml(r.error)}</div>` : ""}
+  `;
+}
+
+async function runProblemCode(app, problem, s, isSubmit){
+  s.running = true; s.results = null; s.consoleTab = "result"; s.activeCase = 0;
+  renderProblemDetail(app, problem.id);
 
   const results = [];
   for(const test of problem.tests){
@@ -4391,23 +4570,25 @@ async function runProblemTests(app, problem, s){
   s.results = results;
   s.running = false;
 
-  // update progress
-  const progress = await getProgress(CURRENT_USER.id);
-  const entry = progress[problem.id] || { solved: false, attempts: 0, hintsUsed: 0 };
-  entry.attempts += 1;
-  if(results.every(r => r.pass)) entry.solved = true;
-  progress[problem.id] = entry;
-  await saveProgress(CURRENT_USER.id, progress);
-
-  if(results.every(r => r.pass)) toast(`${problem.title} solved! 🎉`); else toast("Not quite — check the failing tests.", true);
+  const allPass = results.every(r => r.pass);
+  if(isSubmit){
+    const progress = await getProgress(CURRENT_USER.id);
+    const entry = progress[problem.id] || { solved: false, attempts: 0, hintsUsed: 0 };
+    entry.attempts += 1;
+    if(allPass) entry.solved = true;
+    progress[problem.id] = entry;
+    await saveProgress(CURRENT_USER.id, progress);
+    toast(allPass ? `${problem.title} solved! 🎉` : "Not quite — check the failing tests.", !allPass);
+  } else {
+    toast(allPass ? "All sample tests passed." : "Some sample tests failed.", !allPass);
+  }
 
   renderProblemDetail(app, problem.id);
 }
 
 async function getProblemHint(app, problem, s){
-  s.hintLoading = true;
-  document.getElementById("pd-hint").disabled = true;
-  document.getElementById("pd-hint").textContent = "Thinking…";
+  s.hintLoading = true; s.leftTab = "hint";
+  renderProblemDetail(app, problem.id);
   try{
     s.hint = await generateHint(problem.description, s.code, s.hintLevel);
     const progress = await getProgress(CURRENT_USER.id);
@@ -4421,6 +4602,32 @@ async function getProblemHint(app, problem, s){
     s.hintLoading = false;
     renderProblemDetail(app, problem.id);
   }
+}
+
+// Lightweight drag-to-resize splitter. Updates the DOM directly during
+// drag (no re-render) so dragging stays smooth, and commits the final
+// percentage into state via onChange so it survives re-renders.
+function attachSplitterDrag(handle, container, axis, onChange){
+  if(!handle || !container) return;
+  handle.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    handle.classList.add("dragging");
+    const rect = container.getBoundingClientRect();
+    function move(ev){
+      let pct = axis === "horizontal"
+        ? ((ev.clientX - rect.left) / rect.width) * 100
+        : ((ev.clientY - rect.top) / rect.height) * 100;
+      pct = Math.max(20, Math.min(80, pct));
+      onChange(pct);
+    }
+    function up(){
+      handle.classList.remove("dragging");
+      document.removeEventListener("mousemove", move);
+      document.removeEventListener("mouseup", up);
+    }
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseup", up);
+  });
 }
 
 // ---------- Profile ----------
